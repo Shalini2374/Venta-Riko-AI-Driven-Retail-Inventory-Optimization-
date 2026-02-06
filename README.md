@@ -1,63 +1,129 @@
-VentaRiko: An Agentic AI Inventory Management System
+# VentaRiko – Agentic AI Inventory Management System
 
-VentaRiko is an intelligent "Agentic AI" platform designed to solve the massive problem of food waste in retail. Instead of relying on static, hard-coded rules, VentaRiko follows an OODA Loop (Observe-Orient-Decide-Act) to provide store managers with a realistic, gradual, and data-driven discount strategy for expiring goods.
+VentaRiko is an Agentic AI–driven inventory management system designed to reduce food waste and maximize revenue in retail environments.
+Instead of static, rule-based discounting, VentaRiko follows an Observe–Orient–Decide–Act (OODA) loop to recommend realistic, gradual, and data-driven discounts for expiring products.
 
-🚀 The Core Problem
+---
 
-Supermarkets lose billions every year due to products reaching their expiry date. Most managers use "panic discounting" (e.g., 50% off on the last day), which loses profit. VentaRiko uses Machine Learning to find the "sweet spot"—applying smaller, gradual discounts earlier to ensure the product sells while maximizing revenue.
+## Problem Statement
 
-🧠 The Agentic AI (OODA Loop)
+Supermarkets incur significant losses when products expire unsold.
+A common industry practice is last-day panic discounting (for example, 50% off), which reduces profit margins and fails to leverage early selling opportunities.
 
-Unlike a simple algorithm, VentaRiko behaves as an Agent:
+VentaRiko addresses this problem by identifying the optimal discount “sweet spot,” applying smaller discounts earlier to ensure sales while maximizing overall revenue.
 
-Observe: It queries the inventory database and sales logs.
+---
 
-Orient: It calculates key features like Days_Left, Sales_Velocity, and Stock_Density.
+## Agentic AI Approach (OODA Loop)
 
-Decide: It feeds these features into a RandomForestRegressor (model_v3) to predict the optimal discount.
+VentaRiko operates as an intelligent agent rather than a static algorithm.
 
-Act: It generates a dynamic dashboard and a "Daily To-Do List" for the manager.
+### Observe
 
-📈 Evolution of the Intelligence
+* Queries inventory databases
+* Analyzes historical sales logs
 
-This project demonstrates the evolution of AI decision-making:
+### Orient
 
-v1 (The Classifier): Simple Yes/No prediction for discounts.
+* Engineers critical features:
 
-v2 (The Hybrid): AI-predicted base discounts with hard-coded emergency rules.
+  * Days_Left
+  * Sales_Velocity
+  * Stock_Density
 
-v3 (The Full Agent): A realistic, non-linear model that learned the "gradual curve" from 0% to 50% through custom data engineering.
+### Decide
 
-🛠 Tech Stack
+* Uses a trained RandomForestRegressor (model_v3)
+* Predicts the optimal discount percentage for each product
 
-Backend: Python, FastAPI
+### Act
 
-AI/ML: Scikit-Learn, Pandas, NumPy, Joblib
+* Generates a dynamic management dashboard
+* Produces a daily actionable task list for store managers
 
-Database: SQLAlchemy, SQLite (Multi-Manager Support)
+---
 
-Frontend: HTML5, Tailwind CSS, JavaScript (Vanilla)
+## Evolution of Intelligence
 
-Authentication: JWT (JSON Web Tokens)
+The project demonstrates a clear progression in AI decision-making capability.
 
-🔧 Installation & Setup
+| Version           | Description                                                                  |
+| ----------------- | ---------------------------------------------------------------------------- |
+| v1 – Classifier   | Binary yes/no discount decision                                              |
+| v2 – Hybrid Model | ML-predicted base discounts combined with rule-based emergency logic         |
+| v3 – Full Agent   | Non-linear regression model learning a gradual discount curve from 0% to 50% |
 
-Clone the repository:
+---
 
-git clone [https://github.com/your-username/ventariko-ai-agent.git](https://github.com/your-username/ventariko-ai-agent.git)
+## Technology Stack
+
+**Backend**
+
+* Python
+* FastAPI
+
+**AI / Machine Learning**
+
+* Scikit-learn
+* Pandas
+* NumPy
+* Joblib
+
+**Database**
+
+* SQLAlchemy
+* SQLite (supports multiple managers)
+
+**Frontend**
+
+* HTML5
+* Tailwind CSS
+* Vanilla JavaScript
+
+**Authentication**
+
+* JSON Web Tokens (JWT)
+
+---
+
+## Installation and Setup
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/your-username/ventariko-ai-agent.git
 cd ventariko-ai-agent
+```
 
+### Install Dependencies
 
-Install dependencies:
+```bash
+pip install fastapi uvicorn sqlalchemy pandas numpy scikit-learn joblib \
+python-jose[cryptography] passlib[bcrypt] python-multipart
+```
 
-pip install fastapi uvicorn sqlalchemy pandas numpy scikit-learn joblib python-jose[cryptography] passlib[bcrypt] python-multipart
+### Run the Application
 
-
-Run the server:
-
+```bash
 python main.py
+```
 
+### Access the User Interface
 
-Access the UI:
-Open http://127.0.0.1:8000 in your browser.
+Open a web browser and navigate to:
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## Key Features
+
+* Agent-based decision-making using the OODA loop
+* Revenue-aware discount optimization
+* End-to-end system integrating ML, backend services, authentication, and UI
+* Designed for realistic retail workflows
+
+---
 
