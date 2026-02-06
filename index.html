@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VentaRiko AI Agent</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font family -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Link to your stylesheet -->
+    <link rel="stylesheet" href="/static/styles.css">
+
+    <!-- Tailwind Config for Custom Colors (GREEN THEME) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#047857', // Emerald 700 (Darker Green)
+                        'primary-dark': '#065f46', // Emerald 800 (Darkest Green)
+                        'secondary': '#ECFDF5', // Emerald 50 (Very Light Green)
+                        'accent': '#10B981', // Emerald 500 (Bright Green)
+                        'accent-hover': '#059669', // Emerald 600 (Slightly Darker Accent)
+                        'light-text': '#F0FDFA', // Emerald 50 variant for light text on dark bg
+                        'dark-text': '#111827', // Gray 900 (for light backgrounds)
+                        'muted-text': '#6B7280', // Gray 500
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    height: {
+                        'screen-75': '75vh',
+                        'screen-80': '80vh', // Added for potentially larger hero
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="antialiased font-inter text-dark-text bg-gray-50">
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loadingSpinner" class="fixed inset-0 z-[100] bg-black bg-opacity-60 flex items-center justify-center hidden">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-accent h-24 w-24"></div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="fixed inset-0 z-[90] flex items-center justify-center p-4 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity duration-300" onclick="app.closeModal()"></div>
+        <div class="relative bg-white w-full max-w-sm p-6 rounded-xl shadow-xl transform transition-all duration-300 scale-95 opacity-0 modal-content">
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-900 mb-3">Notice</h3>
+            <p id="modalMessage" class="text-gray-700"></p>
+            <button id="modalCloseButton" class="mt-6 w-full py-2 px-4 rounded-lg font-medium text-white bg-primary hover:bg-primary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Close
+            </button>
+        </div>
+    </div>
+<!-- Authentication Container (Login/Register) -->
+<div id="authContainer"
+     class="min-h-screen w-full flex flex-col md:flex-row overflow-hidden">
+
+  <!-- Left Side Image -->
+  <div class="hidden md:flex md:w-1/2 relative items-center justify-center"
+       style="background-image: url('/static/images/supermarket-employee-checking-bread-shelf-life-flipped.jpg');
+              background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+  </div>
+
+  <!-- Right Side Login/Register Form -->
+  <div class="flex w-full md:w-1/2 items-center justify-center bg-white p-10 md:p-12">
+    <div class="w-full max-w-md form-container">
+      <div class="flex flex-col items-center mb-8">
+        <img src="/static/ventariko_logo.png" alt="VentaRiko Logo" class="h-16 w-auto mb-4">
+        <h1 class="text-3xl font-extrabold text-primary">VentaRiko AI Agent</h1>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginFormContainer">
+        <h2 class="text-2xl font-bold text-dark-text text-center mb-6">Agent Login</h2>
+        <form id="loginForm" class="space-y-5">
+          <div>
+            <label for="login-username" class="input-label">Username</label>
+            <input type="text" id="login-username" name="username" required class="input-field">
+          </div>
+          <div>
+            <label for="login-password" class="input-label">Password</label>
+            <input type="password" id="login-password" name="password" required class="input-field">
+          </div>
+          <button type="submit" class="button-primary w-full">Login</button>
+        </form>
+        <p class="text-center text-sm text-muted-text mt-6">
+          Don't have an account?
+          <a href="#" id="showRegisterPage" class="link">Register here</a>
+        </p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerFormContainer" class="hidden">
+        <h2 class="text-2xl font-bold text-dark-text text-center mb-6">Create Account</h2>
+        <form id="registerForm" class="space-y-5">
+          <div>
+            <label for="register-username" class="input-label">Username</label>
+            <input type="text" id="register-username" required class="input-field">
+          </div>
+          <div>
+            <label for="register-password" class="input-label">Password</label>
+            <input type="password" id="register-password" required class="input-field">
+          </div>
+          <button type="submit" class="button-accent w-full">Register</button>
+        </form>
+        <p class="text-center text-sm text-muted-text mt-6">
+          Already have an account?
+          <a href="#" id="showLoginPage" class="link">Login here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Main Application Layout -->
+    <div id="mainAppLayout" class="hidden min-h-screen flex flex-col">
+        <!-- Header -->
+        <nav class="bg-white shadow-md z-50 relative border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-20 items-center">
+                    <!-- Left: Logo + Brand + Nav -->
+                    <div class="flex items-center space-x-6 lg:space-x-10">
+                        <div class="flex-shrink-0 flex items-center">
+                            <img src="/static/ventariko_logo.png" alt="VentaRiko Logo" class="h-10 w-auto">
+                            <span class="text-2xl font-extrabold text-primary ml-2 hidden sm:inline">VentaRiko</span>
+                        </div>
+                        <div class="hidden md:flex space-x-6">
+                            <a href="#home" class="nav-link active" data-target="homeContent">Home</a>
+                            <a href="#upload" class="nav-link" data-target="uploadContent">Upload</a>
+                            <a href="#dashboard" class="nav-link" data-target="dashboardContent">Dashboard</a>
+                            <a href="#contact" class="nav-link" data-target="contactContent">Contact</a>
+                        </div>
+                    </div>
+                    <!-- Right: User & Logout -->
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm font-medium text-gray-700 hidden sm:block">
+                            Welcome, <strong id="usernameDisplay" class="capitalize text-primary">User</strong>
+                        </span>
+                        <button id="logoutButton" class="button-danger py-2 px-4 text-sm">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1">
+            <!-- PAGE: Home -->
+            <section id="homeContent" class="page-content active">
+                <!-- Hero Section -->
+                 <div class="relative w-full h-screen-80 bg-cover bg-center flex items-center justify-center text-center text-light-text"
+                     style="background-image: linear-gradient(rgba(4, 120, 87, 0.7), rgba(5, 150, 105, 0.8)), url('/static/images/hero_imag5.png');">
+                     <!-- Using Green Gradient Overlay -->
+                    <div class="z-10 p-6 max-w-4xl">
+                        <h2 class="text-5xl md:text-7xl font-extrabold leading-tight mb-4 drop-shadow-lg animate-fade-in-down">
+                            Don’t Dump — Discount Smartly
+                        </h2>
+                        <p class="text-xl md:text-2xl font-light mb-8 drop-shadow-md animate-fade-in-up delay-200">
+                            Let VentaRiko's AI optimize your inventory and find the perfect discounts before expiry.
+                        </p>
+                        <button onclick="app.showMainPage('upload')"
+                                class="button-accent py-3 px-8 text-lg animate-fade-in-up delay-400">
+                            Get Started
+                        </button>
+                    </div>
+                </div>
+
+                <!-- How It Works Section -->
+                <div class="bg-secondary py-16 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto text-center">
+                        <h3 class="text-4xl font-extrabold text-primary mb-6">How VentaRiko Works</h3>
+                        <p class="text-lg text-dark-text mb-12 max-w-3xl mx-auto">
+                            Transform your inventory management in three simple steps.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                            <!-- Step 1 -->
+                            <div class="step-card">
+                                <span class="step-number">1</span>
+                                <img src="/static/images/upload_icon.png" alt="Upload Icon" class="step-icon">
+                                <h4 class="step-title">Upload Your Data</h4>
+                                <p class="step-description">
+                                    Easily import product catalogs, daily sales, and stock batches via CSV or our intuitive interface.
+                                </p>
+                            </div>
+                            <!-- Step 2 -->
+                            <div class="step-card">
+                                <span class="step-number">2</span>
+                                <img src="/static/images/ai_brain_icon.png" alt="AI Brain Icon" class="step-icon">
+                                <h4 class="step-title">AI Analyzes & Predicts</h4>
+                                <p class="step-description">
+                                    Our agent monitors stock, expiry, and sales trends, predicting potential waste and optimal discount points.
+                                </p>
+                            </div>
+                            <!-- Step 3 -->
+                            <div class="step-card">
+                                <span class="step-number">3</span>
+                                <img src="/static/images/report_icon.png" alt="Report Icon" class="step-icon">
+                                <h4 class="step-title">Get Actionable Insights</h4>
+                                <p class="step-description">
+                                    Receive clear dashboard reports with expiry alerts and AI-powered discount recommendations.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="bg-primary text-light-text py-16 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto text-center">
+                        <h3 class="text-4xl font-extrabold mb-10">Trusted by Managers</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div class="review-card">
+                                <blockquote class="text-lg italic mb-6 before:content-['\201C'] before:mr-1 after:content-['\201D'] after:ml-1">
+                                    VentaRiko's expiry tracking is a game-changer. We've cut down spoilage significantly!
+                                </blockquote>
+                                <div class="flex items-center justify-center">
+                                    <img src="/static/images/user1.png" alt="User 1" class="review-avatar">
+                                    <div>
+                                        <p class="font-bold text-xl">Kim Seon-ho</p>
+                                        <p class="text-sm opacity-80">Store Manager, DailyNeeds</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="review-card">
+                                <blockquote class="text-lg italic mb-6 before:content-['\201C'] before:mr-1 after:content-['\201D'] after:ml-1">
+                                    The AI discounts help us move stock faster. It practically pays for itself. Highly recommend!
+                                </blockquote>
+                                <div class="flex items-center justify-center">
+                                    <img src="/static/images/user2.png" alt="User 2" class="review-avatar">
+                                    <div>
+                                        <p class="font-bold text-xl">Park Bo-gum</p>
+                                        <p class="text-sm opacity-80">Inventory Lead, SuperMart</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: Upload -->
+            <section id="uploadContent" class="page-content hidden py-12 px-4 sm:px-6 lg:px-8 bg-gray-100">
+                 <div class="max-w-7xl mx-auto">
+                    <h2 class="text-4xl font-extrabold text-primary mb-8 text-center">Data Upload Center</h2>
+                    <p class="text-lg text-muted-text mb-10 text-center max-w-3xl mx-auto">
+                        Keep VentaRiko informed by uploading your latest product, stock, and sales data. Use the forms below.
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Column 1: Setup & Sales -->
+                        <div class="lg:col-span-1 space-y-8">
+                            <!-- Product Catalog -->
+                             <div class="upload-card">
+                                <h3 class="upload-title">Product Catalog Setup</h3>
+                                <p class="upload-description">
+                                    Upload `products.csv` (ID, Name, Category, Manufacturer). Run once or for new products.
+                                </p>
+                                <form id="inventoryUploadForm">
+                                    <input type="file" name="file" required accept=".csv" class="input-file">
+                                    <button type="submit" class="button-primary w-full mt-4">
+                                        Upload Catalog
+                                    </button>
+                                </form>
+                            </div>
+                            <!-- Daily Sales -->
+                            <div class="upload-card">
+                                <h3 class="upload-title">Upload Daily Sales</h3>
+                                <p class="upload-description">
+                                    Upload `sales.csv` (product_id, quantity_sold). Updates stock & feeds AI.
+                                </p>
+                                <form id="salesUploadForm">
+                                    <input type="file" name="file" required accept=".csv" class="input-file">
+                                    <button type="submit" class="button-primary w-full mt-4">
+                                        Upload Sales
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Add Stock -->
+                        <div class="lg:col-span-2 space-y-8">
+                            <!-- Add Single Batch -->
+                            <div class="upload-card">
+                                <h3 class="upload-title">Add Single Stock Batch</h3>
+                                <p class="upload-description">
+                                    Manually add one incoming batch with its details.
+                                </p>
+                                <form id="addBatchForm" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    <div>
+                                        <label for="batch-product-id" class="input-label">Product ID</label>
+                                        <input type="number" id="batch-product-id" required class="input-field">
+                                    </div>
+                                    <div>
+                                        <label for="batch-quantity" class="input-label">Quantity</label>
+                                        <input type="number" id="batch-quantity" required class="input-field">
+                                    </div>
+                                    <div>
+                                        <label for="batch-expiry" class="input-label">Expiry Date</label>
+                                        <input type="date" id="batch-expiry" required class="input-field">
+                                    </div>
+                                    <div class="sm:col-span-3 mt-4">
+                                        <button type="submit" class="button-accent py-2.5 px-8">
+                                            Add Batch
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Add Bulk Batches -->
+                            <div class="upload-card">
+                                <h3 class="upload-title">Add Bulk Stock Batches</h3>
+                                <p class="upload-description">
+                                    Paste a JSON array for large stock additions.
+                                </p>
+                                <form id="addBulkBatchForm">
+                                    <textarea id="bulk-batch-json" rows="8" class="input-textarea"
+                                              placeholder='[{"product_id": 101, "quantity": 100, "expiry_date": "YYYY-MM-DD"}]'></textarea>
+                                    <button type="submit" class="button-accent py-2.5 px-8 mt-4">
+                                        Add Bulk Batches
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE: Dashboard -->
+            <section id="dashboardContent" class="page-content hidden py-12 px-4 sm:px-6 lg:px-8 bg-gray-100">
+                 <div class="max-w-7xl mx-auto">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
+                            <h2 class="text-3xl font-bold text-primary mb-3 sm:mb-0">
+                                AI Dashboard Report
+                            </h2>
+                            <button id="refreshDashboardButton"
+                                    class="button-primary w-full sm:w-auto flex items-center justify-center py-2.5 px-6 text-base">
+                                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                                Refresh Report
+                            </button>
+                        </div>
+                        <!-- Table Container -->
+                        <div class="w-full overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="table-header">Product Name</th>
+                                        <th class="table-header">Status</th>
+                                        <th class="table-header text-right">Stock</th>
+                                        <th class="table-header text-right">Sales (7D)</th>
+                                        <th class="table-header text-right">Days Left</th>
+                                        <th class="table-header text-right">AI Discount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Placeholder Row -->
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-12 text-center text-muted-text">
+                                            Click "Refresh Report" to load data.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- PAGE: Contact -->
+             <section id="contactContent" class="page-content hidden py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-secondary to-white">
+                 <div class="max-w-7xl mx-auto">
+                    <h2 class="text-4xl font-extrabold text-primary mb-8 text-center">Contact Us</h2>
+                    <p class="text-lg text-muted-text mb-12 text-center max-w-3xl mx-auto">
+                        Have questions or need support? Fill out the form below or use our contact details. We're happy to help!
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+                        <!-- Contact Info -->
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-bold text-primary mb-4">Our Details</h3>
+                            <a href="mailto:support@ventariko.com" class="contact-link group">
+                                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                                support@ventariko.com
+                            </a>
+                            <p class="contact-link">
+                                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                                7675645348
+                            </p>
+                            <p class="contact-link">
+                                <svg class="contact-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                Srinagar anex, 2nd st , Kolathur , Chennai -99
+                            </p>
+                        </div>
+                        <!-- Contact Form -->
+                        <div>
+                            <h3 class="text-2xl font-bold text-primary mb-4">Send Us a Message</h3>
+                            <form action="#" method="POST" class="space-y-5">
+                                <div>
+                                    <label for="contact-name" class="input-label">Full Name</label>
+                                    <input type="text" id="contact-name" class="input-field">
+                                </div>
+                                <div>
+                                    <label for="contact-email" class="input-label">Email</label>
+                                    <input type="email" id="contact-email" class="input-field">
+                                </div>
+                                <div>
+                                    <label for="contact-message" class="input-label">Message</label>
+                                    <textarea id="contact-message" rows="5" class="input-textarea"></textarea>
+                                </div>
+                                <div>
+                                    <button type="submit" class="button-primary w-full py-2.5 text-base">
+                                        Send Message
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+         <footer class="bg-primary-dark text-light-text py-10 px-4 sm:px-6 lg:px-8 mt-auto"> <!-- Darker Footer -->
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-4 md:space-y-0">
+                <div class="flex items-center">
+                    <!-- Ensure you have a white logo file -->
+                    <img src="/static/ventariko_logo_white.png" alt="VentaRiko Logo White" class="h-8 w-auto mr-3"> 
+                    <p class="text-lg font-bold">VentaRiko AI Agent</p>
+                </div>
+                <p class="text-sm opacity-80">&copy; 2024 VentaRiko. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors text-sm">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Link to your script file -->
+    <script src="/static/script.js" defer></script>
+</body>
+</html>

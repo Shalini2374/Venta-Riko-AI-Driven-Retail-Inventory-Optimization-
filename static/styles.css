@@ -1,0 +1,142 @@
+/* ================================
+   🌄 Animated Background (Login Page)
+=================================== */
+@keyframes slide-bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* Authentication Section */
+#authContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  #authContainer {
+    flex-direction: row;
+  }
+}
+
+/* Left Image Side */
+#authContainer .md\\:flex {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+#authContainer .md\\:flex::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Overlay Text on Image */
+#authContainer .md\\:flex > div {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: white;
+}
+
+/* Login Form Section */
+.form-container {
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================================
+   ✨ Fade-in Animation (Login Box)
+=================================== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-container {
+  animation: fade-in 1.5s ease-out;
+}
+
+/* ================================
+   🧩 Step & Icon Styling
+=================================== */
+.step-icon {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1rem;
+  object-fit: contain;
+}
+
+/* ================================
+   👥 Review Image Styling
+=================================== */
+.review-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+/* ================================
+   ☎️ Contact Section Icons
+=================================== */
+.contact-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 0.75rem;
+}
+
+/* ================================
+   📬 Contact Form Fields
+=================================== */
+.input-field,
+.input-textarea {
+  width: 100%;
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  outline: none;
+  background-color: #fff;
+  font-size: 1rem;
+}
+
+.input-field:focus,
+.input-textarea:focus {
+  border-color: #10B981; /* accent green */
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* ================================
+   🎯 Optional General Tweaks
+=================================== */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  color: #111827;
+  background-color: #f9fafb;
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}

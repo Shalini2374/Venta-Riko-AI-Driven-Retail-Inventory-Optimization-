@@ -1,0 +1,22 @@
+id,name,category,manufacturer
+101,Fresh Milk 1L,Dairy,FarmFresh Dairy
+102,Cheddar Cheese 200g,Dairy,DairyLand Farms
+103,Greek Yogurt 500g,Dairy,Healthy Spoon
+104,Butter 250g,Dairy,FarmFresh Dairy
+201,Chicken Breast 500g,Meat,Quality Meats Inc.
+202,Ground Beef 500g,Meat,Quality Meats Inc.
+203,Pork Sausages 6pk,Meat,Butcher's Best
+301,Apples Royal Gala (kg),Produce,Orchard Gold Fruits
+302,Bananas (kg),Produce,Tropicana Imports
+303,Tomatoes (kg),Produce,Green Valley Farms
+304,Spinach Bunch,Produce,Green Valley Farms
+401,Whole Wheat Bread Loaf,Bakery,DailyBread Bakers
+402,Croissants 4pk,Bakery,DailyBread Bakers
+403,Chocolate Chip Cookies 200g,Bakery,Sweet Treats Co.
+501,Cola 2L Bottle,Beverage,Bubbly Co. Drinks
+502,Orange Juice 1L,Beverage,Juice World
+701,Pasta Spaghetti 500g,Pantry,Good Grains Pasta
+702,Rice Basmati 1kg,Pantry,Good Grains Pasta
+703,Canned Tomatoes 400g,Pantry,Chef's Choice Cans
+801,Frozen Peas 500g,Frozen,QuickFreeze Foods
+802,Ice Cream Vanilla 1L,Frozen,Sweet Treats Co.
